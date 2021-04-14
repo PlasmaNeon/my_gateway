@@ -1,0 +1,223 @@
+definitions:
+  io.AdminInfoOutput:
+    properties:
+      avatar:
+        type: string
+      id:
+        type: integer
+      intro:
+        type: string
+      login_time:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      user_name:
+        type: string
+    type: object
+  io.AdminLoginInput:
+    properties:
+      password:
+        example: "123456"
+        type: string
+      username:
+        example: admin
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  io.AdminLoginOutput:
+    properties:
+      token:
+        example: token
+        type: string
+    type: object
+  io.ChangePwdInput:
+    properties:
+      password:
+        example: "123456"
+        type: string
+    required:
+    - password
+    type: object
+  io.ServiceListItemOutput:
+    properties:
+      id:
+        type: integer
+      load_type:
+        type: integer
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      service_addr:
+        type: integer
+      service_desc:
+        type: string
+      service_name:
+        type: string
+      total_node:
+        type: integer
+    type: object
+  io.ServiceListOutput:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/io.ServiceListItemOutput'
+        type: array
+      total:
+        type: integer
+    type: object
+  middleware.Response:
+    properties:
+      data:
+        type: object
+      errmsg:
+        type: string
+      errno:
+        type: integer
+      stack:
+        type: object
+      trace_id:
+        type: object
+    type: object
+info:
+  contact: {}
+paths:
+  /admin/admin_info:
+    get:
+      consumes:
+      - application/json
+      description: Admin info.
+      operationId: /admin/admin_info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.AdminInfoOutput'
+              type: object
+      summary: Admin info.
+      tags:
+      - Admin API.
+  /admin/change_pwd:
+    post:
+      consumes:
+      - application/json
+      description: Change admin password.
+      operationId: /admin/change_pwd
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.ChangePwdInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Change admin password.
+      tags:
+      - Admin API.
+  /admin_login/login:
+    post:
+      consumes:
+      - application/json
+      description: Admin login.
+      operationId: /admin_login/login
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.AdminLoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.AdminLoginOutput'
+              type: object
+      summary: Admin login.
+      tags:
+      - Admin API.
+  /admin_login/logout:
+    get:
+      consumes:
+      - application/json
+      description: Admin logout.
+      operationId: /admin_login/logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Admin logout.
+      tags:
+      - Admin API.
+  /service/service_list:
+    get:
+      consumes:
+      - application/json
+      description: Show service lists.
+      operationId: /service/service_list
+      parameters:
+      - description: Searching keyword
+        in: query
+        name: info
+        type: string
+      - description: Entries per page
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      - description: Page No.
+        in: query
+        name: page_no
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.ServiceListOutput'
+              type: object
+      summary: Service list
+      tags:
+      - Service Management
+swagger: "2.0"
