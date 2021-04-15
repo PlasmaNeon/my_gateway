@@ -7,15 +7,15 @@ import (
 )
 
 type HTTPRule struct {
-	ID            int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId     int64    `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
-	RuleType      int `json:"service_name" gorm:"column:service_name" description:"Service name."`
-	Rule          string `json:"service_desc" gorm:"column:service_desc" description:"Service description."`
-	NeedHttps     int `json:"need_https" gorm:"column:need_https" description:"Service description."`
-	NeedStripUri  int `json:"need_strip_uri" gorm:"column:need_strip_uri" description:"Service description."`
-	NeedWebsocket int `json:"need_websocket" gorm:"column:need_websocket" description:"Service description."`
-	UrlRewrite    string `json:"url_rewrite" gorm:"column:url_rewrite" description:"Service description."`
-	HeaderTransfor string `json:"header_transfor" gorm:"column:header_transfor" description:"Service description."`
+	ID              int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
+	ServiceId       int64  `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
+	RuleType        int    `json:"rule_type" gorm:"column:rule_type" description:"Rule type."`
+	Rule            string `json:"rule" gorm:"column:rule" description:"Service description."`
+	NeedHttps       int    `json:"need_https" gorm:"column:need_https" description:"Service description."`
+	NeedStripUri    int    `json:"need_strip_uri" gorm:"column:need_strip_uri" description:"Service description."`
+	NeedWebsocket   int    `json:"need_websocket" gorm:"column:need_websocket" description:"Service description."`
+	UrlRewrite      string `json:"url_rewrite" gorm:"column:url_rewrite" description:"Service description."`
+	HeaderTransform string `json:"header_transform" gorm:"column:header_transfor" description:"Service description."`
 }
 
 func (t *HTTPRule) TableName() string {

@@ -8,8 +8,8 @@ import (
 
 type TCPRule struct {
 	ID        int64 `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId int64   `json:"service_id" gorm:"column:service_id" description:"Service description.""`
-	Port      int   `json:"port" gorm:"column:port" description:"Port."`
+	ServiceId int64 `json:"service_id" gorm:"column:service_id" description:"Service description.""`
+	Port      int64 `json:"port" gorm:"column:port" description:"Port."`
 }
 
 func (t *TCPRule) TableName() string {

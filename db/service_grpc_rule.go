@@ -7,9 +7,9 @@ import (
 )
 
 type GRPCRule struct {
-	ID              int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId       int64    `json:"service_id" gorm:"column:service_id" description:"Service description.""`
-	Port            int    `json:"port" gorm:"column:port" description:"Port."`
+	ID             int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
+	ServiceId      int64  `json:"service_id" gorm:"column:service_id" description:"Service description.""`
+	Port           int64  `json:"port" gorm:"column:port" description:"Port."`
 	HeaderTransfor string `json:"header_transfor" gorm:"column:header_transfor" description:"Service description."`
 }
 
