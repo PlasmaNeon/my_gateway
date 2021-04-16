@@ -9,12 +9,12 @@ import (
 
 type LoadBalance struct {
 	ID                     int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId              int64    `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
-	CheckMethod            int    `json:"service_name" gorm:"column:service_name" description:"Service name."`
-	CheckTimeout           int    `json:"service_desc" gorm:"column:service_desc" description:"Service description."`
-	CheckInterval          int    `json:"need_https" gorm:"column:need_https" description:"Service description."`
-	RoundType              int    `json:"need_strip_uri" gorm:"column:need_strip_uri" description:"Service description."`
-	IPList                 string `json:"need_websocket" gorm:"column:need_websocket" description:"Service description."`
+	ServiceId              int64  `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
+	CheckMethod            int    `json:"check_method" gorm:"column:check_method" description:"Service name."`
+	CheckTimeout           int    `json:"check_timeout" gorm:"column:check_timeout" description:"Service description."`
+	CheckInterval          int    `json:"check_interval" gorm:"column:check_interval" description:"Service description."`
+	RoundType              int    `json:"round_type" gorm:"column:round_type" description:"Service description."`
+	IpList                 string `json:"ip_list" gorm:"column:ip_list" description:"Service description."`
 	WeightList             string `json:"weight_list" gorm:"column:weight_list" description:"Service description."`
 	ForbidList             string `json:"forbid_list" gorm:"column:forbid_list" description:"Service description."`
 	UpstreamConnectTimeout int    `json:"upstream_connect_timeout" gorm:"column:upstream_connect_timeout" description:"Service description."`
@@ -40,6 +40,6 @@ func (t *LoadBalance) Save(c *gin.Context, tx *gorm.DB) error {
 	return tx.SetCtx(public.GetGinTraceContext(c)).Save(t).Error
 }
 
-func (t *LoadBalance) GetIPListByModel () []string{
-	return strings.Split(t.IPList, ",")
+func (t *LoadBalance) GetIPListByModel() []string {
+	return strings.Split(t.IpList, ",")
 }

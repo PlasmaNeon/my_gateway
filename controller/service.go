@@ -18,8 +18,9 @@ func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
 	group.GET("/service_delete", service.ServiceDelete)
+	group.GET("/service_detail", service.ServiceDelete)
 	group.POST("/service_add_http", service.ServiceAddHTTP)
-
+	group.POST("/service_update_http", service.ServiceUpdateHTTP)
 }
 
 //ServiceList godoc
@@ -214,7 +215,154 @@ func (adminlogin *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	}
 	if err := httpRule.Save(c, tx); err != nil {
 		tx = tx.Rollback()
-		middleware.ResponseError(c, 2005, errors.New("IP list length and Weight list length are not equal!!"))
+		middleware.ResponseError(c, 2006, errors.New("IP list length and Weight list length are not equal!!"))
+		return
+	}
+
+	accessControl := &db.AccessControl{
+		ServiceId:         serviceModel.ID,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		ClientIpFlowLimit: params.ClientIpFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	if err := accessControl.Save(c, tx); err != nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2007, errors.New("accessControl save failed."))
+		return
+	}
+
+	loadBalance := &db.LoadBalance{
+		ServiceId:              serviceModel.ID,
+		RoundType:              params.RoundType,
+		IpList:                 params.IpList,
+		WeightList:             params.WeightList,
+		UpstreamConnectTimeout: params.UpstreamConnectTimeOut,
+		UpstreamHeaderTimeout:  params.UpstreamHeaderTimeOut,
+		UpstreamIdleTimeout:    params.UpstreamIdleTimeOut,
+		UpstreamMaxIdle:        params.UpstreamMaxIdle,
+	}
+	if err := loadBalance.Save(c, tx); err != nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2008, errors.New("loadBalance add failed."))
+		return
+	}
+	tx.Commit()
+	middleware.ResponseSuccess(c, "")
+
+}
+
+//ServiceUpdateHTTP godoc
+//@Summary Update HTTP service
+//@Description  Update HTTP service
+//@Tags Service Management
+//@ID /service/service_update_http
+//@Accept  json
+//@Produce  json
+//@Param body body io.ServiceUpdateHTTPInput true "body"
+//@Success 200 {object} middleware.Response{data=string} "success"
+//@Router /service/service_update_http [post]
+func (adminlogin *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
+	params := &io.ServiceAddHTTPInput{}
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+	if len(strings.Split(params.IpList, "\n")) !=
+		len(strings.Split(params.WeightList, "\n")) {
+		middleware.ResponseError(c, 2001, errors.New("IP list length and Weight list length are not equal!!"))
+		return
+	}
+
+	serviceInfo := &db.ServiceInfo{ServiceName: params.ServiceName}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	tx = tx.Begin()
+	serviceDetail, err := serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	if err == nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2003, errors.New("Service does not exist!"))
+		return
+	}
+
+	serviceDetail.HTTPRule.NeedHttps = params.NeedHttps
+	serviceDetail.HTTPRule.NeedStripUri = params.NeedStripUri
+	serviceDetail.HTTPRule.NeedWebsocket = params.NeedWebsocket
+	serviceDetail.HTTPRule.UrlRewrite = params.UrlRewrite
+	serviceDetail.HTTPRule.HeaderTransform = params.HeadTransform
+
+	if err := serviceDetail.HTTPRule.Save(c, tx); err != nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2004, errors.New("httpRule update failed!!"))
+		return
+	}
+
+	serviceDetail.AccessControl.OpenAuth = params.OpenAuth
+	serviceDetail.AccessControl.BlackList = params.BlackList
+	serviceDetail.AccessControl.WhiteList = params.WhiteList
+
+	serviceDetail.AccessControl.ClientIpFlowLimit = params.ClientIpFlowLimit
+	serviceDetail.AccessControl.ServiceFlowLimit = params.ServiceFlowLimit
+	if err := serviceDetail.AccessControl.Save(c, tx); err != nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2005, errors.New("accessControl update failed."))
+		return
+	}
+
+	serviceDetail.LoadBalance.RoundType = params.RoundType
+	serviceDetail.LoadBalance.IpList = params.IpList
+	serviceDetail.LoadBalance.WeightList = params.WeightList
+	serviceDetail.LoadBalance.UpstreamConnectTimeout = params.UpstreamConnectTimeOut
+	serviceDetail.LoadBalance.UpstreamHeaderTimeout = params.UpstreamHeaderTimeOut
+	serviceDetail.LoadBalance.UpstreamIdleTimeout = params.UpstreamIdleTimeOut
+	serviceDetail.LoadBalance.UpstreamMaxIdle = params.UpstreamMaxIdle
+	if err := serviceDetail.LoadBalance.Save(c, tx); err != nil {
+		tx = tx.Rollback()
+		middleware.ResponseError(c, 2006, errors.New("loadBalance update failed."))
+		return
+	}
+	tx.Commit()
+	middleware.ResponseSuccess(c, "")
+
+}
+
+//ServiceDetail godoc
+//@Summary Delete a service
+//@Description Delete a service.
+//@Tags Service Management
+//@ID /service/service_detail
+//@Accept  json
+//@Produce  json
+//@Param id query string true "service id"
+//@Success 200 {object} middleware.Response{data=string} "success"
+//@Router /service/service_detail [get]
+func (service *ServiceController) ServiceDetail(c *gin.Context) {
+	params := &io.ServiceDeleteInput{}
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	serviceInfo := &db.ServiceInfo{ID: params.Id}
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+
+	serviceInfo.IsDelete = 1
+	if err := serviceInfo.Save(c, tx); err != nil {
+		middleware.ResponseError(c, 2003, err)
 		return
 	}
 	middleware.ResponseSuccess(c, "")
