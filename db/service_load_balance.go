@@ -8,8 +8,8 @@ import (
 )
 
 type LoadBalance struct {
-	ID                     int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId              int64  `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
+	ID                     int    `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
+	ServiceID              int    `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
 	CheckMethod            int    `json:"check_method" gorm:"column:check_method" description:"Service name."`
 	CheckTimeout           int    `json:"check_timeout" gorm:"column:check_timeout" description:"Service description."`
 	CheckInterval          int    `json:"check_interval" gorm:"column:check_interval" description:"Service description."`

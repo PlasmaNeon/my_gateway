@@ -1,4 +1,148 @@
 definitions:
+  db.AccessControl:
+    properties:
+      black_list:
+        type: string
+      clientip_flow_limit:
+        type: integer
+      id:
+        type: integer
+      open_auth:
+        type: integer
+      service_flow_limit:
+        type: integer
+      service_id:
+        type: integer
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    type: object
+  db.AppInfo:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  db.GRPCRule:
+    properties:
+      header_transfor:
+        type: string
+      id:
+        type: integer
+      port:
+        type: integer
+      service_id:
+        type: integer
+    type: object
+  db.HTTPRule:
+    properties:
+      header_transform:
+        type: string
+      id:
+        type: integer
+      need_https:
+        type: integer
+      need_strip_uri:
+        type: integer
+      need_websocket:
+        type: integer
+      rule:
+        type: string
+      rule_type:
+        type: integer
+      service_id:
+        type: integer
+      url_rewrite:
+        type: string
+    type: object
+  db.LoadBalance:
+    properties:
+      check_interval:
+        type: integer
+      check_method:
+        type: integer
+      check_timeout:
+        type: integer
+      forbid_list:
+        type: string
+      id:
+        type: integer
+      ip_list:
+        type: string
+      round_type:
+        type: integer
+      service_id:
+        type: integer
+      upstream_connect_timeout:
+        type: integer
+      upstream_header_timeout:
+        type: integer
+      upstream_idle_timeout:
+        type: integer
+      upstream_max_idle:
+        type: integer
+      weight_list:
+        type: string
+    type: object
+  db.ServiceDetail:
+    properties:
+      access_control:
+        $ref: '#/definitions/db.AccessControl'
+      grpc_rule:
+        $ref: '#/definitions/db.GRPCRule'
+      http_rule:
+        $ref: '#/definitions/db.HTTPRule'
+      info:
+        $ref: '#/definitions/db.ServiceInfo'
+      load_balance:
+        $ref: '#/definitions/db.LoadBalance'
+      tcp_rule:
+        $ref: '#/definitions/db.TCPRule'
+    type: object
+  db.ServiceInfo:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      load_type:
+        type: integer
+      service_desc:
+        type: string
+      service_name:
+        type: string
+      update_at:
+        type: string
+    type: object
+  db.TCPRule:
+    properties:
+      id:
+        type: integer
+      port:
+        type: integer
+      service_id:
+        type: integer
+    type: object
   io.AdminInfoOutput:
     properties:
       avatar:
@@ -34,6 +178,87 @@ definitions:
         example: token
         type: string
     type: object
+  io.AppAddInput:
+    properties:
+      app_id:
+        description: ID            int  `json:"id" form:"id" comment:"Service id"
+          example:"56" validate:"required,min=1"`
+        type: string
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - app_id
+    - name
+    type: object
+  io.AppListItemOutput:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  io.AppListOutput:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/io.AppListItemOutput'
+        type: array
+      total:
+        type: integer
+    type: object
+  io.AppStatOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    type: object
+  io.AppUpdateInput:
+    properties:
+      app_id:
+        type: string
+      id:
+        example: 56
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      white_ips:
+        type: string
+    required:
+    - app_id
+    - id
+    - name
+    type: object
   io.ChangePwdInput:
     properties:
       password:
@@ -41,6 +266,77 @@ definitions:
         type: string
     required:
     - password
+    type: object
+  io.DashboardGlobalFlowStatOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    type: object
+  io.DashboardGlobalServiceCountOutput:
+    properties:
+      count:
+        items:
+          $ref: '#/definitions/io.ServiceCount'
+        type: array
+      services:
+        items:
+          type: string
+        type: array
+    type: object
+  io.DashboardSumDataOutput:
+    properties:
+      app_num:
+        type: integer
+      current_qps:
+        type: integer
+      service_num:
+        type: integer
+      today_request_num:
+        type: integer
+    type: object
+  io.ServiceAddGRPCInput:
+    properties:
+      black_list:
+        type: string
+      client_ip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      head_transform:
+        type: string
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - forbid_list
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
     type: object
   io.ServiceAddHTTPInput:
     properties:
@@ -71,8 +367,6 @@ definitions:
       service_flow_limit:
         type: integer
       service_name:
-        description: ID            int64  `json:"id" form:"id" comment:"Service id"
-          example:"56" validate:"required,min=1"`
         type: string
       upstream_connect_time_out:
         type: integer
@@ -94,6 +388,55 @@ definitions:
     - service_desc
     - service_name
     - weight_list
+    type: object
+  io.ServiceAddTCPInput:
+    properties:
+      black_list:
+        type: string
+      client_ip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      head_transform:
+        type: string
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        description: ID            int64  `json:"id" form:"id" comment:"Service id"
+          example:"56" validate:"required,min=1"`
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - forbid_list
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
+    type: object
+  io.ServiceCount:
+    properties:
+      count:
+        type: integer
+      load_type:
+        type: integer
+      name:
+        type: string
     type: object
   io.ServiceListItemOutput:
     properties:
@@ -122,6 +465,59 @@ definitions:
         type: array
       total:
         type: integer
+    type: object
+  io.ServiceStatOutput:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    type: object
+  io.ServiceUpdateGRPCInput:
+    properties:
+      black_list:
+        type: string
+      client_ip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      head_transform:
+        type: string
+      id:
+        example: 56
+        type: integer
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - forbid_list
+    - id
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
     type: object
   io.ServiceUpdateHTTPInput:
     properties:
@@ -182,6 +578,48 @@ definitions:
     - service_name
     - weight_list
     type: object
+  io.ServiceUpdateTCPInput:
+    properties:
+      black_list:
+        type: string
+      client_ip_flow_limit:
+        type: integer
+      forbid_list:
+        type: string
+      head_transform:
+        type: string
+      id:
+        example: 56
+        type: integer
+      ip_list:
+        type: string
+      open_auth:
+        type: integer
+      port:
+        type: integer
+      round_type:
+        type: integer
+      service_desc:
+        type: string
+      service_flow_limit:
+        type: integer
+      service_name:
+        type: string
+      weight_list:
+        type: string
+      white_host_name:
+        type: string
+      white_list:
+        type: string
+    required:
+    - forbid_list
+    - id
+    - ip_list
+    - port
+    - service_desc
+    - service_name
+    - weight_list
+    type: object
   middleware.Response:
     properties:
       data:
@@ -198,6 +636,33 @@ definitions:
 info:
   contact: {}
 paths:
+  /AppInfo/App_detail:
+    get:
+      consumes:
+      - application/json
+      description: Get service detail.
+      operationId: /app/app_detail
+      parameters:
+      - description: service id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/db.AppInfo'
+              type: object
+      summary: Get service detail
+      tags:
+      - AppInfo Management
   /admin/admin_info:
     get:
       consumes:
@@ -296,6 +761,95 @@ paths:
       summary: Admin logout.
       tags:
       - Admin API.
+  /dashboard/global_flow_stat:
+    get:
+      consumes:
+      - application/json
+      description: Get service statistics.
+      operationId: /dashboard/global_flow_stat
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.DashboardGlobalFlowStatOutput'
+              type: object
+      tags:
+      - Dashboard Management
+  /dashboard/global_services_count:
+    get:
+      consumes:
+      - application/json
+      description: Get service statistics.
+      operationId: /dashboard/global_services_count
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.DashboardGlobalServiceCountOutput'
+              type: object
+      tags:
+      - Dashboard Management
+  /dashboard/sum_data:
+    get:
+      consumes:
+      - application/json
+      description: Dashboard summarize data
+      operationId: /dashboard/sum_data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.DashboardSumDataOutput'
+              type: object
+      summary: Dashboard summarize data
+      tags:
+      - Dashboard Management
+  /service/service_add_grpc:
+    post:
+      consumes:
+      - application/json
+      description: Add GRPC service.
+      operationId: /service/service_add_grpc
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.ServiceAddGRPCInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Add GRPC service.
+      tags:
+      - Service Management
   /service/service_add_http:
     post:
       consumes:
@@ -324,6 +878,34 @@ paths:
       summary: Add HTTP service
       tags:
       - Service Management
+  /service/service_add_tcp:
+    post:
+      consumes:
+      - application/json
+      description: Add TCP service.
+      operationId: /service/service_add_tcp
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.ServiceAddTCPInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Add TCP service.
+      tags:
+      - Service Management
   /service/service_delete:
     get:
       consumes:
@@ -349,6 +931,33 @@ paths:
                   type: string
               type: object
       summary: Delete a service
+      tags:
+      - Service Management
+  /service/service_detail:
+    get:
+      consumes:
+      - application/json
+      description: Get service detail.
+      operationId: /service/service_detail
+      parameters:
+      - description: service id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/db.ServiceDetail'
+              type: object
+      summary: Get service detail
       tags:
       - Service Management
   /service/service_list:
@@ -387,6 +996,60 @@ paths:
       summary: Service list
       tags:
       - Service Management
+  /service/service_stat:
+    get:
+      consumes:
+      - application/json
+      description: Get service statistics.
+      operationId: /service/service_stat
+      parameters:
+      - description: service id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/io.ServiceStatOutput'
+              type: object
+      tags:
+      - Service Management
+  /service/service_update_grpc:
+    post:
+      consumes:
+      - application/json
+      description: Update GRPC Service
+      operationId: /service/service_update_grpc
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.ServiceUpdateGRPCInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update GRPC Service
+      tags:
+      - Service Management
   /service/service_update_http:
     post:
       consumes:
@@ -413,6 +1076,34 @@ paths:
                   type: string
               type: object
       summary: Update HTTP service
+      tags:
+      - Service Management
+  /service/service_update_tcp:
+    post:
+      consumes:
+      - application/json
+      description: Update TCP service
+      operationId: /service/service_update_tcp
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/io.ServiceUpdateTCPInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update TCP service.
       tags:
       - Service Management
 swagger: "2.0"

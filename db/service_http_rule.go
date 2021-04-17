@@ -7,8 +7,8 @@ import (
 )
 
 type HTTPRule struct {
-	ID              int64  `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
-	ServiceId       int64  `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
+	ID              int    `json:"id" gorm:"primary_key" description:"Auto increasing primary key."`
+	ServiceId       int    `json:"service_id" gorm:"column:service_id" description:"http:0, tcp:1, grpc:2"`
 	RuleType        int    `json:"rule_type" gorm:"column:rule_type" description:"Rule type."`
 	Rule            string `json:"rule" gorm:"column:rule" description:"Service description."`
 	NeedHttps       int    `json:"need_https" gorm:"column:need_https" description:"Service description."`

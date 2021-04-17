@@ -75,7 +75,6 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-
 	adminLoginRouter := router.Group("/admin_login")
 	store, err := sessions.NewRedisStore(10, "tcp", "127.0.0.1:6379",
 		"", []byte("secret"))
@@ -88,9 +87,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
-		)
+	)
 	controller.AdminLoginRegister(adminLoginRouter)
-
 
 	adminRouter := router.Group("/admin")
 	adminRouter.Use(
@@ -111,6 +109,26 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.TranslationMiddleware(),
 	)
 	controller.ServiceRegister(serviceRouter)
+
+	appRouter := router.Group("/app")
+	appRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
+	)
+	controller.AppRegister(appRouter)
+
+	dashboardRouter := router.Group("/dashboard")
+	dashboardRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
+	)
+	controller.DashboardRegister(dashboardRouter)
 
 	return router
 	////demo
